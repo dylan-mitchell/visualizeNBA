@@ -13,11 +13,60 @@ import datetime
 sys.path.insert(0, os.path.realpath(os.path.dirname(__file__)))
 os.chdir(os.path.realpath(os.path.dirname(__file__)))
 
+# List of game info EX:[Home Team Tri Code, Home Team ID, HomeWin, HomeLoss, HomeScore,  Away Team Tri Code, Away Team ID, AwayWin, AwayLoss, Away Score, Game Time, televised, clock]
+class Game:
+  def __init__(self, hTri, hID, hWin, hLoss, hScore, aTri, aID, aWin, aLoss, aScore, gameTime, televised, clock):
+    self.hTri = hTri
+    self.hID = hID
+    self.hWin = hWin
+    self.hLoss = hLoss
+    self.hScore = hScore
+    self.aTri = aTri
+    self.aID = aID
+    self.aWin = aWin
+    self.aLoss = aLoss
+    self.aScore = aScore
+    self.gameTime = gameTime
+    self.televised = televised
+    self.clock = clock
 
 colors = {
     'background': '#545556',
     'text': '#CECECE',
     'inputcolor': '#FF206E',
+}
+
+id2Tri = {
+    '1610612761': 'TOR',
+    '1610612749': 'MIL',
+    '1610612754': 'IND',
+    '1610612738': 'BOS',
+    '1610612755': 'PHI',
+    '1610612766': 'CHA',
+    '1610612765': 'DET',
+    '1610612753': 'ORL',
+    '1610612748': 'MIA',
+    '1610612751': 'BKN',
+    '1610612764': 'WAS',
+    '1610612752': 'NYK',
+    '1610612739': 'CLE',
+    '1610612737': 'ATL',
+    '1610612741': 'CHI',
+    '1610612743': 'DEN',
+    '1610612744': 'GSW',
+    '1610612760': 'OKC',
+    '1610612746': 'LAC',
+    '1610612747': 'LAL',
+    '1610612763': 'MEM',
+    '1610612742': 'DAL',
+    '1610612757': 'POR',
+    '1610612758': 'SAC',
+    '1610612759': 'SAS',
+    '1610612740': 'NOP',
+    '1610612762': 'UTA',
+    '1610612745': 'HOU',
+    '1610612750': 'MIN',
+    '1610612756': 'PHX'
 }
 
 app = dash.Dash(__name__)
@@ -65,7 +114,7 @@ tab_selected_style = {
 
 tabs_styles = {
     'height': '44px',
-    'width': '40%'
+    'width': '60%'
 }
 
 
@@ -76,6 +125,7 @@ app.layout =  html.Div([
         dcc.Tab(className='custom-tab', style=tab_style, selected_style=tab_selected_style, selected_className='custom-tab--selected', label='Today\'s Games', value='tab-1'),
         dcc.Tab(className='custom-tab', style=tab_style, selected_style=tab_selected_style, selected_className='custom-tab--selected', label='Current Player Stats', value='tab-2'),
         dcc.Tab(className='custom-tab', style=tab_style, selected_style=tab_selected_style, selected_className='custom-tab--selected', label='League Standings', value='tab-3'),
+        dcc.Tab(className='custom-tab', style=tab_style, selected_style=tab_selected_style, selected_className='custom-tab--selected', label='League Leaders', value='tab-4')
         ], style=tabs_styles),
         html.Div(id='tabs-content')]),
         html.Div(className='row', children=[html.Div(id="output-games", className='col s12 m6 l6')]),
@@ -253,15 +303,15 @@ def generateGames(date):
         else:
             televised = "blank"
 
-        home_team_data = game_data['vTeam']
-        away_team_data = game_data['hTeam']
+        home_team_data = game_data['hTeam']
+        away_team_data = game_data['vTeam']
 
-
+        clock = ' '
         if game_data['isGameActivated'] == False and home_team_data['score'] != '' and home_team_data['score'] != "0" :
-             clock = "Game Ended" 
-        elif game_data['isGameActivated'] == False:
+             clock = "Game Ended"
+        if game_data['isGameActivated'] == False:
             clock = " "
-        elif game_data['isGameActivated'] == True:
+        if game_data['isGameActivated'] == True:
             time = game_data['clock']
             if period['current'] == 1:
                 clock = "1st " + str(time)
@@ -278,12 +328,12 @@ def generateGames(date):
             if period['current'] == 4:
                 clock = "4th " + str(time)
                 if period['isEndOfPeriod'] == True:
-                    clock = "Game Ended"   
-        
+                    clock = "Game Ended"
 
 
-        games.append([home_team_data['triCode'], home_team_data['teamId'], home_team_data['win'], home_team_data['loss'], home_team_data['score'], away_team_data['triCode'], away_team_data['teamId'], away_team_data['win'], away_team_data['loss'], away_team_data['score'], timeOfGame, televised, clock])
-        print("Added Game: " + games[x][1] + " VS " + games[x][6])
+
+        games.append(Game(home_team_data['triCode'], home_team_data['teamId'], home_team_data['win'], home_team_data['loss'], home_team_data['score'], away_team_data['triCode'], away_team_data['teamId'], away_team_data['win'], away_team_data['loss'], away_team_data['score'], timeOfGame, televised, clock))
+        print("Added Game: " + games[x].hID + " VS " + games[x].aID)
     return games
 
 
@@ -306,7 +356,9 @@ def render_content(tab):
                  dcc.Dropdown(
                     id='gameDropdown',
                     options=[
-                        {'label': games[x][0] + ' VS ' + games[x][5], 'value': games[x][0] + ' VS ' + games[x][5]} for x in range(0,len(games))
+                    # List of game info EX:[Home Team Tri Code, Home Team ID, HomeWin, HomeLoss, HomeScore,  Away Team Tri Code, Away Team ID, AwayWin, AwayLoss, Away Score, Game Time, televised, clock]
+
+                        {'label': games[x].hTri + ' VS ' + games[x].aTri, 'value': games[x].hTri + ' VS ' + games[x].aTri} for x in range(0,len(games))
                         ],
                     placeholder="Select a game to analyze...",
                     searchable=False
@@ -319,6 +371,10 @@ def render_content(tab):
         return html.Div(id='league-output', children=[
                 html.H2("League Standings"),
                 html.Div(id='league-graph')
+        ])
+    elif tab == 'tab-4':
+        return html.Div(id='leagueLeaders-output', children=[
+                html.H2("Coming Soon!")
         ])
 
 @app.callback(
@@ -350,17 +406,17 @@ def update_today(n):
                               html.Tr(
                                   children=[
                                     #   Home Logo
-                                      html.Td(html.Img(className='logo', src='assets\\' + games[x][0] + '.png' )),
+                                      html.Td(html.Img(className='logo', src='assets\\' + games[x].hTri + '.png' )),
                                     #   Away Logo
-                                      html.Td(html.Img(className='logo', src='assets\\' + games[x][5] + '.png' )),
+                                      html.Td(html.Img(className='logo', src='assets\\' + games[x].aTri + '.png' )),
                                     #   Game Time Start
-                                      html.Td(games[x][10]),
+                                      html.Td(games[x].gameTime),
                                     #   Game Score
-                                      html.Td(games[x][4] + " - " + games[x][9]),
+                                      html.Td(games[x].hScore + " - " + games[x].aScore),
                                     #   Time Remaining in Game
-                                      html.Td(games[x][12]),
+                                      html.Td(games[x].clock),
                                     #   National TV schedule Logo
-                                      html.Td(html.Img(src='assets\\' + games[x][11] + '.png' ))
+                                      html.Td(html.Img(src='assets\\' + games[x].televised + '.png' ))
                                       ], style={'color':colors['text']}
                                   )for x in range(0,len(games))])
                           ]
@@ -385,7 +441,7 @@ def updateStatChart(input_data):
 def update_output(gameName):
     game = []
     for x in range(0, len(games)-1):
-        name = games[x][0] + ' VS ' + games[x][5]
+        name = games[x].hTri + ' VS ' + games[x].aTri
         if name == gameName:
             game = games[x]
 
@@ -400,9 +456,9 @@ def update_output(gameName):
     for x in range(0, 47):
         team_data = teams_data[x]
         try:
-            if team_data['teamId'] == game[1]:
+            if team_data['teamId'] == game.hID:
                 color1 = team_data['primaryColor']
-            if team_data['teamId'] == game[6]:
+            if team_data['teamId'] == game.aID:
                 color2 = team_data['primaryColor']
         except:
             # Do Nothing
@@ -419,7 +475,7 @@ def update_output(gameName):
 
     for x in range(0, len(teams_data)):
         team_data = teams_data[x]
-        if team_data['teamId'] == game[1]:
+        if team_data['teamId'] == game.hID:
             team1ppg = team_data['ppg']
             team1ppg = team1ppg['avg']
             team1oppg = team_data['oppg']
@@ -428,7 +484,7 @@ def update_output(gameName):
             team1apg = team1apg['avg']
             team1trpg = team_data['trpg']
             team1trpg = team1trpg['avg']
-        if team_data['teamId'] == game[6]:
+        if team_data['teamId'] == game.aID:
             team2ppg = team_data['ppg']
             team2ppg = team2ppg['avg']
             team2oppg = team_data['oppg']
@@ -444,14 +500,14 @@ def update_output(gameName):
     # List of game info EX:[Home Team Tri Code, Home Team ID, HomeWin, HomeLoss, HomeScore,  Away Team Tri Code, Away Team ID, AwayWin, AwayLoss, Away Score, Game Time, televised, clock]
 
     x = ['Wins', 'Losses', "Points per Game", "Oppenent Points per Game", "Assist per Game", "Rebounds per Game"]
-    y = [game[2], game[3], team1ppg, team1oppg, team1apg, team1trpg]
-    y2 = [game[7], game[8], team2ppg, team2oppg, team2apg, team2trpg]
+    y = [game.hWin, game.hLoss, team1ppg, team1oppg, team1apg, team1trpg]
+    y2 = [game.aWin, game.aLoss, team2ppg, team2oppg, team2apg, team2trpg]
 
     trace1 = go.Bar(
-        name = game[0],
+        name = game.hTri,
         x=x,
         y=y,
-        text=game[0],
+        text=game.hTri,
         textposition = 'auto',
         marker=dict(
             color=color1,
@@ -463,10 +519,10 @@ def update_output(gameName):
     )
 
     trace2 = go.Bar(
-        name = game[5],
+        name = game.aTri,
         x=x,
         y=y2,
-        text=game[5],
+        text=game.aTri,
         textposition = 'auto',
         marker=dict(
             color=color2,
@@ -481,7 +537,7 @@ def update_output(gameName):
                 figure=go.Figure(
                     data=[trace1, trace2],
                     layout=go.Layout(
-                        title=game[0] + ' VS ' + game[5],
+                        title=game.hTri + ' VS ' + game.aTri,
                         showlegend=True,
                         font={'color':colors['text']},
                         plot_bgcolor = colors['background'],
@@ -508,30 +564,60 @@ def update_standings(n):
     league_data = league_data['conference']
     east_data = league_data['east']
     west_data = league_data['west']
-    
+
     idEast = []
     winEast = []
     lossEast = []
     streakEast = []
+    homeWinEast = []
+    awayWinEast = []
+    homeLossEast = []
+    awayLossEast = []
+    lastTenWinEast = []
+    lastTenLossEast = []
 
     for x in range(0, 15):
         team_data = east_data[x]
         idEast.append(team_data['teamId'])
-        winEast.append(team_data['win'])
-        lossEast.append(team_data['loss'])
-        streakEast.append(team_data['streak'])
+        winEast.append(int(team_data['win']))
+        lossEast.append(int(team_data['loss']))
+        if team_data['isWinStreak'] == True:
+            streakEast.append("W"+ str(team_data['streak']))
+        else:
+            streakEast.append("L"+ str(team_data['streak']))
+        homeWinEast.append(team_data['homeWin'])
+        awayWinEast.append(team_data['awayWin'])
+        homeLossEast.append(team_data['homeLoss'])
+        awayLossEast.append(team_data['awayLoss'])
+        lastTenWinEast.append(team_data['lastTenWin'])
+        lastTenLossEast.append(team_data['lastTenLoss'])
 
     idWest = []
     winWest = []
     lossWest = []
     streakWest = []
+    homeWinWest = []
+    awayWinWest = []
+    homeLossWest = []
+    awayLossWest = []
+    lastTenWinWest = []
+    lastTenLossWest = []
 
     for x in range(0, 15):
         team_data = west_data[x]
         idWest.append(team_data['teamId'])
-        winWest.append(team_data['win'])
-        lossWest.append(team_data['loss'])
-        streakWest.append(team_data['streak'])
+        winWest.append(int(team_data['win']))
+        lossWest.append(int(team_data['loss']))
+        if team_data['isWinStreak'] == True:
+            streakWest.append("W"+ str(team_data['streak']))
+        else:
+            streakWest.append("L"+ str(team_data['streak']))
+        homeWinWest.append(team_data['homeWin'])
+        awayWinWest.append(team_data['awayWin'])
+        homeLossWest.append(team_data['homeLoss'])
+        awayLossWest.append(team_data['awayLoss'])
+        lastTenWinWest.append(team_data['lastTenWin'])
+        lastTenLossWest.append(team_data['lastTenLoss'])
 
     colorsEast = []
     colorsWest = []
@@ -541,7 +627,7 @@ def update_standings(n):
     teams_data = requests.get(url).json()
     teams_data = teams_data['teams']
     teams_data = teams_data['config']
-    
+
 
     for x in range(0, len(idEast) - 1):
         for y in range(0, 48):
@@ -549,11 +635,82 @@ def update_standings(n):
             if team_data['teamId'] == idEast[x]:
                 colorsEast.append(team_data['primaryColor'])
             if team_data['teamId'] == idWest[x]:
-                colorsWest.append(team_data['primaryColor'])    
-       
+                colorsWest.append(team_data['primaryColor'])
 
 
-    return html.H2("Coming Soon!")
+
+
+    return html.Table(className="responsive-standings",
+                  children=[
+                      html.Thead(
+                          html.Tr(
+                              children=[
+                                  html.Th("East"),
+                                  html.Th("W"),
+                                  html.Th("L"),
+                                  html.Th("Pct"),
+                                  html.Th("GB"),
+                                  html.Th("Home"),
+                                  html.Th("Away"),
+                                  html.Th("Last 10"),
+                                  html.Th("Streak"),
+                                  html.Th("West"),
+                                  html.Th("W"),
+                                  html.Th("L"),
+                                  html.Th("Pct"),
+                                  html.Th("GB"),
+                                  html.Th("Home"),
+                                  html.Th("Away"),
+                                  html.Th("Last 10"),
+                                  html.Th("Streak")],
+                              style={'color':colors['text']}
+                              )
+                          ),
+                      html.Tbody(
+                          [
+
+                          html.Tr(
+                              children=[
+                                #   East Logo
+                                  html.Td(html.Img(className='logo-small', src='assets\\' + id2Tri[idEast[x]] + '.png' )),
+                                #   Win East
+                                  html.Td(winEast[x]),
+                                #   Loss East
+                                  html.Td(lossEast[x]),
+                                #   East Pct
+                                  html.Td(format(round(winEast[x]/(winEast[x] + lossEast[x]), 3), '.3f')),
+                                #   East GB
+                                  html.Td(((winEast[0] - lossEast[0]) - (winEast[x] - lossEast[x])) / 2),
+                                #  Home
+                                  html.Td(str(homeWinEast[x]) + " - " + str(homeLossEast[x])),
+                                #  Away
+                                  html.Td(str(awayWinEast[x]) + " - " + str(awayLossEast[x])),
+                                #  Last 10
+                                  html.Td(str(lastTenWinEast[x]) + " - " + str(lastTenLossEast[x])),
+                                #   streak
+                                  html.Td(streakEast[x]),
+                                #   West Logo
+                                  html.Td(html.Img(className='logo-small', src='assets\\' + id2Tri[idWest[x]] + '.png' )),
+                                #   Win West
+                                  html.Td(winWest[x]),
+                                #   Loss West
+                                  html.Td(lossWest[x]),
+                                #   West Pct
+                                  html.Td(format(round(winEast[x]/(winEast[x] + lossEast[x]), 3), '.3f')),
+                                #   West GB
+                                  html.Td(((winWest[0] - lossWest[0]) - (winWest[x] - lossWest[x])) / 2),
+                                  #  Home
+                                    html.Td(str(homeWinWest[x]) + " - " + str(homeLossWest[x])),
+                                  #  Away
+                                    html.Td(str(awayWinWest[x]) + " - " + str(awayLossWest[x])),
+                                  #  Last 10
+                                    html.Td(str(lastTenWinWest[x]) + " - " + str(lastTenLossWest[x])),
+                                #   streak
+                                  html.Td(streakWest[x])
+                                  ], style={'color':colors['text']}
+                              )for x in range(0, 15)])
+                      ]
+                      )
 
 
 app.scripts.append_script({

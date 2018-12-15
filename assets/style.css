@@ -39,6 +39,10 @@ img{
   height: 100px;
   width: 100px;
 }
+.logo-small{
+  height: 50px;
+  width: 50px;
+}
 .gameDropdown{
   width: 20%;
   color: red;
@@ -57,9 +61,10 @@ img{
 .responsive-table{
   padding: 50px;
   width: 70%
+  align: 'center';
 }
 
-th, td {
+.responsive-table th, .responsive-table td {
     border-bottom: 1px solid #ddd;
     padding: 0px;
     width: 20%;
@@ -67,10 +72,22 @@ th, td {
 /* table {
     border-collapse: collapse;
 } */
-th{
+.responsive-table th{
   font-size: 1.2em;
   height: 50px;
 
+}
+
+.responsive-standings{
+  padding: 50px;
+  width: 100%
+  align: 'center';
+}
+
+.responsive-standings th, .responsive-standings td {
+    border-bottom: 1px solid #ddd;
+    padding: 0px;
+    width: 5%;
 }
 
 button{
