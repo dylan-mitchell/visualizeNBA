@@ -43,21 +43,7 @@ img{
   height: 50px;
   width: 50px;
 }
-.gameDropdown{
-  width: 20%;
-  color: red;
-}
 
-
-/* #column1{
-  width: 10%;
-  float: left;
-}
-#column2{
-  width: 10%;
-
-  float: left;
-} */
 .responsive-table{
   padding: 50px;
   width: 70%

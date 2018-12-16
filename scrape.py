@@ -1,6 +1,6 @@
 from basketball_reference_web_scraper import client
 from operator import itemgetter
- 
+
 
 # box_scores = client.player_box_scores(day=1, month=1, year=2017)
 # print('***** BOX SCORES *****')
@@ -71,7 +71,7 @@ class TeamStats():
 
 def getTeamTotals(season_stats):
 
-    
+
 
     teamTotals = {
         "ATLANTA HAWKS" : TeamStats(),
@@ -119,7 +119,7 @@ def getTeamTotals(season_stats):
         teamTotals[total['team'].value].teamFGM += total["made_field_goals"]
 
     return teamTotals
-        
+
 
 def getAdvancedStats(season_stats, leagueTotals, teamTotals):
     factor = (2/3) - ((.5*(leagueTotals["leagueAssists"]/leagueTotals["leagueFGM"]))/(2*(leagueTotals["leagueFGM"]/leagueTotals["leagueFTM"])))
@@ -167,7 +167,6 @@ season_totals = getAdvancedStats(season_totals, leagueTotals, teamTotals)
 print(season_totals)
 
 
-newlist = sorted(season_totals, key=itemgetter('points_per_game'))
-for total in newlist:
-    print(str(total['name']) + " " + str(total['points_per_game']))
-    
+# newlist = sorted(season_totals, key=itemgetter('points_per_game'))
+# for total in newlist:
+#     print(str(total['name']) + " " + str(total['points_per_game']))
