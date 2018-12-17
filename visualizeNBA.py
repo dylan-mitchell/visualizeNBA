@@ -875,7 +875,7 @@ def update_standings(n):
                                 #   Loss West
                                   html.Td(lossWest[x]),
                                 #   West Pct
-                                  html.Td(format(round(winEast[x]/(winEast[x] + lossEast[x]), 3), '.3f')),
+                                  html.Td(format(round(winWest[x]/(winWest[x] + lossWest[x]), 3), '.3f')),
                                 #   West GB
                                   html.Td(((winWest[0] - lossWest[0]) - (winWest[x] - lossWest[x])) / 2),
                                   #  Home
