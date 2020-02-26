@@ -1,7 +1,7 @@
 import requests
 import json
 import dash
-from dash.dependencies import Input, Output, Event
+from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -229,20 +229,16 @@ app.config['suppress_callback_exceptions']=True
 app.title = "5x5Stats"
 
 main_api = 'https://data.nba.net/'
-year = '2018'
+year = '2019'
 games = []
 
-# http://data.nba.net/10s/prod/v1/today.json
-today_api = main_api + '10s/prod/v1/today.json'
-url = today_api
-today_data = requests.get(url).json()
-today_data = today_data['links']
-# today = today_data['anchorDate']
 today = datetime.datetime.today().strftime('%Y%m%d')
 
 
 
 player_info_api = main_api + '10s/prod/v1/' + year + '/players.json'
+
+print(player_info_api)
 
 url = player_info_api
 json_data = requests.get(url).json()
@@ -318,7 +314,7 @@ def player2graph(input_data):
     # http://data.nba.net/10s/prod/v1/2018/players/2544_profile.json is example of Lebron James
     individual_api = main_api + '10s/prod/v1/' + year + "/players/" + player_id + "_profile.json"
     url = individual_api
-    player_data = requests.get(url).json()
+    player_data = requests.get(url, timeout=5).json()
     player_data = player_data['league']
     player_data = player_data['standard']
     player_data = player_data['stats']
@@ -433,7 +429,7 @@ def generateGames(date):
     # http://data.nba.net/10s/prod/v1/20181016/scoreboard.json
     scoreboard_api = main_api + '10s/prod/v1/' + date + '/scoreboard.json'
     url = scoreboard_api
-    scoreboard_data = requests.get(url).json()
+    scoreboard_data = requests.get(url, timeout=5).json()
     scoreboard_data = scoreboard_data['games']
     gameCount = 0
 
@@ -528,7 +524,7 @@ def render_content(tab):
                 html.Div(id='league-graph')
         ])
     elif tab == 'tab-4':
-        currentYear = 2019
+        currentYear = 2020
         stats = ['Points', 'Assists', 'Steals', 'Blocks', 'Turnovers', 'Fouls', 'Rebounds', 'Offensive Rebounds', 'Defensive Rebounds', 'Minutes Played', 'Three Pointers Made', 'Three Point Percentage', 'Free Throw Percentage', 'Steals + Blocks']
         return html.Div(id='leagueLeaders-output', children=[
                 html.H2("League Leaders"),
@@ -627,7 +623,7 @@ def update_output(gameName):
     # http://data.nba.net/10s/prod/2018/teams_config.json
     teams_api = main_api + '10s/prod/' + year + '/teams_config.json'
     url = teams_api
-    teams_data = requests.get(url).json()
+    teams_data = requests.get(url, timeout=5).json()
     teams_data = teams_data['teams']
     teams_data = teams_data['config']
 
@@ -646,7 +642,7 @@ def update_output(gameName):
     # http://data.nba.net/10s/prod/v1/2018/team_stats_rankings.json
     teams_api = main_api + '10s/prod/v1/' + year + '/team_stats_rankings.json'
     url = teams_api
-    teams_data = requests.get(url).json()
+    teams_data = requests.get(url, timeout=5).json()
     teams_data = teams_data['league']
     teams_data = teams_data['standard']
     teams_data = teams_data['regularSeason']
@@ -737,7 +733,7 @@ def update_standings(n):
     league_standings_api = main_api + '/10s/prod/v1/current/standings_conference.json'
 
     url = league_standings_api
-    league_data = requests.get(url).json()
+    league_data = requests.get(url, timeout=5).json()
     league_data = league_data['league']
     league_data = league_data['standard']
     league_data = league_data['conference']
@@ -803,7 +799,7 @@ def update_standings(n):
 
     teams_api = main_api + '10s/prod/' + year + '/teams_config.json'
     url = teams_api
-    teams_data = requests.get(url).json()
+    teams_data = requests.get(url, timeout=5).json()
     teams_data = teams_data['teams']
     teams_data = teams_data['config']
 
@@ -975,11 +971,6 @@ def update_output(seasonYear, statCat):
             )
 
     # return html.H1(str(seasonYear) + str(statCat))
-
-
-app.scripts.append_script({
-'external_url': 'assets\\gtag.js'
-})
 
 server = app.server
 

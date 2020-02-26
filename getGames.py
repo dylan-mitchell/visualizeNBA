@@ -11,7 +11,7 @@ print(today)
 # http://data.nba.net/10s/prod/v1/20181016/scoreboard.json
 scoreboard_api = main_api + '10s/prod/v1/' + today + '/scoreboard.json'
 url = scoreboard_api
-scoreboard_data = requests.get(url).json()
+scoreboard_data = requests.get(url, timeout=5).json()
 scoreboard_data = scoreboard_data['games']
 gameCount = 0
 
